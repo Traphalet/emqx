@@ -51,57 +51,57 @@ jobs:
               name: cover
               path: _build/test/cover
 
-#    run_common_test:
-#        needs: prepare
-#        runs-on: ${{ matrix.runs-on }}
-#        strategy:
-#          fail-fast: false
-#          matrix:
-#            runs-on:
-#              - aws-amd64
-#              - ubuntu-20.04
-#            use-self-hosted:
-#              - ${{ github.repository_owner == 'emqx' }}
-#            app_name: ${{ fromJson(needs.prepare.outputs.ct_apps) }}
-#            exclude:
-#              - runs-on: ubuntu-20.04
-#                use-self-hosted: true
-#              - runs-on: aws-amd64
-#                use-self-hosted: false
-#        steps:
-#        - uses: actions/checkout@v2
-#          # to avoid dirty self-hosted runners
-#        - name: stop containers
-#          run: |
-#            docker rm -f $(docker ps -qa) || true
-#            docker network rm $(docker network ls -q) || true
-#        - name: erlang container
-#          run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
-#        # runs ct for current $WHICH_APP and produces $PROFILE-$WHICH_APP.coverdata
-#        - name: run common test
-#          env:
-#            WHICH_APP: ${{ matrix.app_name }}
-#          run: |
-#            docker exec -i erlang bash -c "make ct-pipeline"
-#        - name: cat rebar.crashdump
-#          if: failure()
-#          run: if [ -f 'rebar3.crashdump' ];then cat 'rebar3.crashdump'; fi
-#        - uses: actions/upload-artifact@v3
-#          with:
-#            name: cover
-#            path: _build/test/cover
-#            if-no-files-found: warn # do not fail if no coverdata found
-#        - uses: actions/upload-artifact@v1
-#          if: failure()
-#          with:
-#            name: logs
-#            path: _build/test/logs
-#
+    run_common_test:
+        needs: prepare
+        runs-on: ${{ matrix.runs-on }}
+        strategy:
+          fail-fast: false
+          matrix:
+            runs-on:
+              - aws-amd64
+              - ubuntu-20.04
+            use-self-hosted:
+              - ${{ github.repository_owner == 'emqx' }}
+            app_name: ${{ fromJson(needs.prepare.outputs.ct_apps) }}
+            exclude:
+              - runs-on: ubuntu-20.04
+                use-self-hosted: true
+              - runs-on: aws-amd64
+                use-self-hosted: false
+        steps:
+        - uses: actions/checkout@v2
+          # to avoid dirty self-hosted runners
+        - name: stop containers
+          run: |
+            docker rm -f $(docker ps -qa) || true
+            docker network rm $(docker network ls -q) || true
+        - name: erlang container
+          run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
+        # runs ct for current $WHICH_APP and produces $PROFILE-$WHICH_APP.coverdata
+        - name: run common test
+          env:
+            WHICH_APP: ${{ matrix.app_name }}
+          run: |
+            docker exec -i erlang bash -c "make ct-pipeline"
+        - name: cat rebar.crashdump
+          if: failure()
+          run: if [ -f 'rebar3.crashdump' ];then cat 'rebar3.crashdump'; fi
+        - uses: actions/upload-artifact@v3
+          with:
+            name: cover
+            path: _build/test/cover
+            if-no-files-found: warn # do not fail if no coverdata found
+        - uses: actions/upload-artifact@v1
+          if: failure()
+          with:
+            name: logs
+            path: _build/test/logs
+
     make_cover:
         needs:
           - prepare
           - eunit_and_proper
-#          - run_common_test
+          - run_common_test
         runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v2
@@ -121,19 +121,19 @@ jobs:
               printenv > .env
               docker exec -i erlang bash -c "git config --global --add safe.directory /emqx"
               docker exec -i erlang bash -c "make cover"
-              docker exec --env-file .env -i erlang bash -c "make coveralls"
+              #docker exec --env-file .env -i erlang bash -c "make coveralls"
           - name: get coveralls logs
             if: failure()
             run: cat rebar3.crashdump
 
-    finish:
-        needs: make_cover
-        runs-on: ubuntu-20.04
-        steps:
-          - name: Coveralls Finished
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            run: |
-              curl -v -k https://coveralls.io/webhook \
-                   --header "Content-Type: application/json" \
-                   --data "{\"repo_name\":\"$GITHUB_REPOSITORY\",\"repo_token\":\"$GITHUB_TOKEN\",\"payload\":{\"build_num\":$GITHUB_RUN_ID,\"status\":\"done\"}}" || true
+#    finish:
+#        needs: make_cover
+#        runs-on: ubuntu-20.04
+#        steps:
+#          - name: Coveralls Finished
+#            env:
+#              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#            run: |
+#              curl -v -k https://coveralls.io/webhook \
+#                   --header "Content-Type: application/json" \
+#                   --data "{\"repo_name\":\"$GITHUB_REPOSITORY\",\"repo_token\":\"$GITHUB_TOKEN\",\"payload\":{\"build_num\":$GITHUB_RUN_ID,\"status\":\"done\"}}" || true
