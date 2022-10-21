@@ -101,7 +101,7 @@ jobs:
         needs:
           - prepare
           - eunit_and_proper
-          - run_common_test
+          - ct
         runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v2
