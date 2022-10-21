@@ -37,7 +37,7 @@ jobs:
               docker network rm $(docker network ls -q) || true
           - name: docker compose up
             run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
-          # produces eunit.coverdata
+          # produces $PROFILE-eunit.coverdata
           - name: eunit
             run: |
               docker exec -i erlang bash -c "git config --global --add safe.directory /emqx"
@@ -97,43 +97,43 @@ jobs:
 #            name: logs
 #            path: _build/test/logs
 #
-#    make_cover:
-#        needs:
-#          - prepare
-#          - eunit_and_proper
-#          - run_common_test
-#        runs-on: ubuntu-20.04
-#        steps:
-#          - uses: actions/checkout@v2
-#          - name: stop containers
-#            run: |
-#              docker rm -f $(docker ps -qa) || true
-#              docker network rm $(docker network ls -q) || true
-#          - name: erlang container
-#            run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
-#          - uses: actions/download-artifact@v2
-#            name: download coverdata
-#            with:
-#              name: cover
-#              path: _build/test/cover
-#          - name: run cover
-#            run: |
-#              printenv > .env
-#              docker exec -i erlang bash -c "git config --global --add safe.directory /emqx"
-#              docker exec -i erlang bash -c "make cover"
-#              docker exec --env-file .env -i erlang bash -c "make coveralls"
-#          - name: get coveralls logs
-#            if: failure()
-#            run: cat rebar3.crashdump
-#
-#    finish:
-#        needs: make_cover
-#        runs-on: ubuntu-20.04
-#        steps:
-#          - name: Coveralls Finished
-#            env:
-#              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#            run: |
-#              curl -v -k https://coveralls.io/webhook \
-#                   --header "Content-Type: application/json" \
-#                   --data "{\"repo_name\":\"$GITHUB_REPOSITORY\",\"repo_token\":\"$GITHUB_TOKEN\",\"payload\":{\"build_num\":$GITHUB_RUN_ID,\"status\":\"done\"}}" || true
+    make_cover:
+        needs:
+          - prepare
+          - eunit_and_proper
+          - run_common_test
+        runs-on: ubuntu-20.04
+        steps:
+          - uses: actions/checkout@v2
+          - name: stop containers
+            run: |
+              docker rm -f $(docker ps -qa) || true
+              docker network rm $(docker network ls -q) || true
+          - name: erlang container
+            run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
+          - uses: actions/download-artifact@v2
+            name: download coverdata
+            with:
+              name: cover
+              path: _build/test/cover
+          - name: run cover
+            run: |
+              printenv > .env
+              docker exec -i erlang bash -c "git config --global --add safe.directory /emqx"
+              docker exec -i erlang bash -c "make cover"
+              docker exec --env-file .env -i erlang bash -c "make coveralls"
+          - name: get coveralls logs
+            if: failure()
+            run: cat rebar3.crashdump
+
+    finish:
+        needs: make_cover
+        runs-on: ubuntu-20.04
+        steps:
+          - name: Coveralls Finished
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              curl -v -k https://coveralls.io/webhook \
+                   --header "Content-Type: application/json" \
+                   --data "{\"repo_name\":\"$GITHUB_REPOSITORY\",\"repo_token\":\"$GITHUB_TOKEN\",\"payload\":{\"build_num\":$GITHUB_RUN_ID,\"status\":\"done\"}}" || true
