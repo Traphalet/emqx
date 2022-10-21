@@ -51,18 +51,18 @@ jobs:
               name: cover
               path: _build/test/cover
 
-    run_common_test:
+    ct:
         needs: prepare
         runs-on: ${{ matrix.runs-on }}
         strategy:
           fail-fast: false
           matrix:
+            app_name: ${{ fromJson(needs.prepare.outputs.ct_apps) }}
             runs-on:
               - aws-amd64
               - ubuntu-20.04
             use-self-hosted:
               - ${{ github.repository_owner == 'emqx' }}
-            app_name: ${{ fromJson(needs.prepare.outputs.ct_apps) }}
             exclude:
               - runs-on: ubuntu-20.04
                 use-self-hosted: true
@@ -82,7 +82,7 @@ jobs:
           env:
             WHICH_APP: ${{ matrix.app_name }}
           run: |
-            docker exec -i erlang bash -c "make ${{ matrix.app_name }}-ct-pipeline"
+            docker exec -i erlang bash -c "make ${WHICH_APP}-ct-pipeline"
         - name: cat rebar.crashdump
           if: failure()
           run: if [ -f 'rebar3.crashdump' ];then cat 'rebar3.crashdump'; fi
