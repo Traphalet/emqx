@@ -100,7 +100,7 @@ jobs:
     make_cover:
         needs:
           - prepare
-#          - eunit_and_proper
+          - eunit_and_proper
 #          - run_common_test
         runs-on: ubuntu-20.04
         steps:
