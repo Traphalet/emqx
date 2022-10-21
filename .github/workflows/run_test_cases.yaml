@@ -82,7 +82,7 @@ jobs:
           env:
             WHICH_APP: ${{ matrix.app_name }}
           run: |
-            docker exec -i erlang bash -c "make ct-pipeline"
+            docker exec -i erlang bash -c "make ${{ matrix.app_name }}-ct-pipeline"
         - name: cat rebar.crashdump
           if: failure()
           run: if [ -f 'rebar3.crashdump' ];then cat 'rebar3.crashdump'; fi
