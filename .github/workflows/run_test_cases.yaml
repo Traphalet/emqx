@@ -27,29 +27,29 @@ jobs:
               echo "ct-apps: $ct_apps"
               echo "::set-output name=ct_apps::$ct_apps"
 
-#    eunit_and_proper:
-#        runs-on: ubuntu-20.04
-#        steps:
-#          - uses: actions/checkout@v2
-#          - name: stop containers
-#            run: |
-#              docker rm -f $(docker ps -qa) || true
-#              docker network rm $(docker network ls -q) || true
-#          - name: docker compose up
-#            run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
-#          # produces eunit.coverdata
-#          - name: eunit
-#            run: |
-#              docker exec -i erlang bash -c "make eunit"
-#          # produces proper.coverdata
-#          - name: proper
-#            run: |
-#              docker exec -i erlang bash -c "make proper"
-#          - uses: actions/upload-artifact@v1
-#            with:
-#              name: cover
-#              path: _build/test/cover
-#
+    eunit_and_proper:
+        runs-on: ubuntu-20.04
+        steps:
+          - uses: actions/checkout@v2
+          - name: stop containers
+            run: |
+              docker rm -f $(docker ps -qa) || true
+              docker network rm $(docker network ls -q) || true
+          - name: docker compose up
+            run: docker-compose -f .ci/docker-compose-file/docker-compose.yaml up -d --build
+          # produces eunit.coverdata
+          - name: eunit
+            run: |
+              docker exec -i erlang bash -c "make eunit"
+          # produces proper.coverdata
+          - name: proper
+            run: |
+              docker exec -i erlang bash -c "make proper"
+          - uses: actions/upload-artifact@v1
+            with:
+              name: cover
+              path: _build/test/cover
+
 #    run_common_test:
 #        needs: prepare
 #        runs-on: ${{ matrix.runs-on }}
