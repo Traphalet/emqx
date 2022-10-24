@@ -25,7 +25,7 @@ jobs:
             id: run_find_apps
             run: |
               # emqx_plugin_libs does not have a test suite (yet) -> exclude it from app list
-              ct_apps="$(./scripts/find-apps.sh --json) | jq -c 'del (.[] | select (. == "apps/emqx_plugin_libs"))')"
+              ct_apps="$(./scripts/find-apps.sh --json | jq -c 'del (.[] | select (. == "apps/emqx_plugin_libs"))')"
               echo "ct-apps: $ct_apps"
               echo "::set-output name=ct_apps::$ct_apps"
           - name: get_all_deps
