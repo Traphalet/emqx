@@ -70,6 +70,7 @@ jobs:
         needs: prepare
         runs-on: ${{ matrix.runs-on }}
         strategy:
+          max-parallel: 5
           fail-fast: false
           matrix:
             app_name: ${{ fromJson(needs.prepare.outputs.ct_apps) }}
