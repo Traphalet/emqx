@@ -41,7 +41,7 @@ get-dashboard:
 
 .PHONY: eunit
 eunit: $(REBAR)
-	@ENABLE_COVER_COMPILE=1 $(REBAR) eunit -v -c --cover_export_name $(PROFILE)-eunit
+	@ENABLE_COVER_COMPILE=1 $(REBAR) eunit -v -c
 
 .PHONY: proper
 proper: $(REBAR)
