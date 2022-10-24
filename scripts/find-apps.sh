@@ -57,7 +57,6 @@ LIBES="$("$FIND" 'lib-extra' -mindepth 1 -maxdepth 1 -type l -exec test -e {} \;
 
 APPS_ALL="$(echo -e "${EM}\n${CE}\n${LIB}\n${LIBE}\n${LIBES}")"
 
-
 if [ "$WANT_JSON" = 'yes' ]; then
     echo "${APPS_ALL}" | xargs | tr -d '\n' | jq -R -s -c 'split(" ")'
 else
