@@ -16,6 +16,10 @@ jobs:
           ct_apps: ${{ steps.run_find_apps.outputs.ct_apps }}
         steps:
           - uses: AutoModality/action-clean@v1
+          - name: clean containers
+            run: |
+              docker rm -f $(docker ps -qa) || true
+              docker network rm $(docker network ls -q) || true
           - uses: actions/checkout@v2
             with:
               path: source
@@ -31,8 +35,8 @@ jobs:
             run: docker-compose -f source/.ci/docker-compose-file/docker-compose.yaml up -d --build
           - name: get_all_deps
             run: |
-              docker exec -it erlang bash -c 'make deps-all'
-              docker exec -it erlang bash -c './rebar3 as test compile'
+              docker exec -i erlang bash -c 'make deps-all'
+              docker exec -i erlang bash -c './rebar3 as test compile'
               zip -ryq source.zip source/* source/.[^.]*
           - uses: actions/upload-artifact@v2
             with:
@@ -56,11 +60,15 @@ jobs:
               path: .
           - name: unzip source code
             run: unzip -o -q source.zip
+          - name: clean containers
+            run: |
+              docker rm -f $(docker ps -qa) || true
+              docker network rm $(docker network ls -q) || true
           - name: create run container
             run: docker-compose -f source/.ci/docker-compose-file/docker-compose.yaml up -d --build
           # produces eunit.coverdata and proper.coverdata
           - name: eunit and proper
-            run: docker exec -it erlang bash -c 'make ${{ matrix.task }}'
+            run: docker exec -i erlang bash -c 'make ${{ matrix.task }}'
           - uses: actions/upload-artifact@v1
             with:
               name: cover
