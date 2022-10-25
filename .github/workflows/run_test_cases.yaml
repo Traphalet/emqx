@@ -183,10 +183,13 @@ jobs:
         if: failure()
         working-directory: source
         run: if [ -f 'rebar3.crashdump' ];then cat 'rebar3.crashdump'; fi
+      - name: set log file name
+        if: failure()
+        run: echo "LOGFILENAME=logs-$(echo ${{ matrix.app_name }} | tr '/' '_')" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: logs-${{ matrix.app_name }}
+          name: logs-${{ env.LOGFILENAME }}
           path: source/_build/test/logs
           if-no-files-found: warn
       - uses: actions/upload-artifact@v3

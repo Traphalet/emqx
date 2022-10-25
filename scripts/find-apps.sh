@@ -28,34 +28,35 @@ while [ "$#" -gt 0 ]; do
             ;;
     esac
 done
-if [ "$(./scripts/get-distro.sh)" = 'windows' ]; then
-    # Otherwise windows may resolve to find.exe
-    FIND="/usr/bin/find"
-else
-    FIND='find'
-fi
-
-find_app() {
-    local appdir="$1"
-    "$FIND" "${appdir}" -mindepth 1 -maxdepth 1 -type d
-}
-
-EM="emqx"
-CE="$(find_app 'apps')"
-
-if [ -f 'EMQX_ENTERPRISE' ]; then
-    LIB="$(find_app 'lib-ee')"
-else
-    LIB="$(find_app 'lib-ce')"
-fi
-
-## find directories in lib-extra
-LIBE="$(find_app 'lib-extra')"
-
-## find symlinks in lib-extra
-LIBES="$("$FIND" 'lib-extra' -mindepth 1 -maxdepth 1 -type l -exec test -e {} \; -print)"
-
-APPS_ALL="$(echo -e "${EM}\n${CE}\n${LIB}\n${LIBE}\n${LIBES}")"
+#if [ "$(./scripts/get-distro.sh)" = 'windows' ]; then
+#    # Otherwise windows may resolve to find.exe
+#    FIND="/usr/bin/find"
+#else
+#    FIND='find'
+#fi
+#
+#find_app() {
+#    local appdir="$1"
+#    "$FIND" "${appdir}" -mindepth 1 -maxdepth 1 -type d
+#}
+#
+#EM="emqx"
+#CE="$(find_app 'apps')"
+#
+#if [ -f 'EMQX_ENTERPRISE' ]; then
+#    LIB="$(find_app 'lib-ee')"
+#else
+#    LIB="$(find_app 'lib-ce')"
+#fi
+#
+### find directories in lib-extra
+#LIBE="$(find_app 'lib-extra')"
+#
+### find symlinks in lib-extra
+#LIBES="$("$FIND" 'lib-extra' -mindepth 1 -maxdepth 1 -type l -exec test -e {} \; -print)"
+#
+#APPS_ALL="$(echo -e "${EM}\n${CE}\n${LIB}\n${LIBE}\n${LIBES}")"
+APPS_ALL="$(echo apps/emqx_management)"
 
 if [ "$WANT_JSON" = 'yes' ]; then
     echo "${APPS_ALL}" | xargs | tr -d '\n' | jq -R -s -c 'split(" ")'
