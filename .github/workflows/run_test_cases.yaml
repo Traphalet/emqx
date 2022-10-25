@@ -189,7 +189,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: logs-${{ env.LOGFILENAME }}
+          name: ${{ env.LOGFILENAME }}
           path: source/_build/test/logs
           if-no-files-found: warn
       - uses: actions/upload-artifact@v3
