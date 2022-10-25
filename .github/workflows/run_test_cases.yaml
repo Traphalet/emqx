@@ -91,7 +91,7 @@ jobs:
             use-self-hosted: true
           - runs-on: aws-amd64
             use-self-hosted: false
-      steps:
+    steps:
       - uses: AutoModality/action-clean@v1
       - uses: actions/download-artifact@v3
         with:
