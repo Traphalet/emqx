@@ -12,28 +12,27 @@ on:
 jobs:
     prepare:
         runs-on: ubuntu-20.04
-        container: emqx/build-env:erl23.3.4.9-3-ubuntu20.04
         outputs:
           ct_apps: ${{ steps.run_find_apps.outputs.ct_apps }}
         steps:
+          - uses: AutoModality/action-clean@v1
           - uses: actions/checkout@v2
             with:
               path: source
               fetch-depth: 0
           - name: find_ct_apps
-            working-directory: source
             id: run_find_apps
             # emqx_plugin_libs doesn't have a test suite -> excluded from app list
             run: |
-              ct_apps="$(./scripts/find-apps.sh --json | jq -c 'del (.[] | select (. == "apps/emqx_plugin_libs"))')"
+              ct_apps="$(./source/scripts/find-apps.sh --json | jq -c 'del (.[] | select (. == "apps/emqx_plugin_libs"))')"
               echo "ct-apps: $ct_apps"
               echo "::set-output name=ct_apps::$ct_apps"
+          - name: create run container
+            run: docker-compose -f source/.ci/docker-compose-file/docker-compose.yaml up -d --build
           - name: get_all_deps
-            working-directory: source
             run: |
-              make deps-all
-              ./rebar3 as test compile
-              cd ..
+              docker exec -it erlang bash -c 'make deps-all'
+              docker exec -it erlang bash -c './rebar3 as test compile'
               zip -ryq source.zip source/* source/.[^.]*
           - uses: actions/upload-artifact@v2
             with:
@@ -43,7 +42,6 @@ jobs:
     eunit_and_proper:
         needs: prepare
         runs-on: ubuntu-20.04
-        container: emqx/build-env:erl23.3.4.9-3-ubuntu20.04
         strategy:
           fail-fast: false
           matrix:
@@ -58,10 +56,11 @@ jobs:
               path: .
           - name: unzip source code
             run: unzip -o -q source.zip
+          - name: create run container
+            run: docker-compose -f source/.ci/docker-compose-file/docker-compose.yaml up -d --build
           # produces eunit.coverdata and proper.coverdata
           - name: eunit and proper
-            working-directory: source
-            run: make ${{ matrix.task }}
+            run: docker exec -it erlang bash -c 'make ${{ matrix.task }}'
           - uses: actions/upload-artifact@v1
             with:
               name: cover
