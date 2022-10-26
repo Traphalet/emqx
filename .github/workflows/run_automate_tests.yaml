@@ -65,7 +65,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: emqx-docker-image
         path: /tmp
@@ -85,7 +85,7 @@ jobs:
         repository: emqx/emqx-svt-web-server
         ref: web-server-1.0
         path: emqx-svt-web-server
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
     - name: run webserver in docker
       run: |
         cd ./emqx-svt-web-server/svtserver
@@ -113,7 +113,7 @@ jobs:
         java-version: '8.0.282' # The JDK version to make available on the path.
         java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
         architecture: x64 # (x64 or x86) - defaults to x64
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: apache-jmeter.tgz
         path: /tmp
@@ -163,7 +163,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: emqx-docker-image
         path: /tmp
@@ -204,7 +204,7 @@ jobs:
         java-version: '8.0.282' # The JDK version to make available on the path.
         java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
         architecture: x64 # (x64 or x86) - defaults to x64
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: apache-jmeter.tgz
         path: /tmp
@@ -268,7 +268,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: emqx-docker-image
         path: /tmp
@@ -306,7 +306,7 @@ jobs:
         java-version: '8.0.282' # The JDK version to make available on the path.
         java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
         architecture: x64 # (x64 or x86) - defaults to x64
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: apache-jmeter.tgz
         path: /tmp
@@ -362,7 +362,7 @@ jobs:
     needs: build
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: emqx-docker-image
         path: /tmp
@@ -402,7 +402,7 @@ jobs:
         java-version: '8.0.282' # The JDK version to make available on the path.
         java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
         architecture: x64 # (x64 or x86) - defaults to x64
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: apache-jmeter.tgz
         path: /tmp

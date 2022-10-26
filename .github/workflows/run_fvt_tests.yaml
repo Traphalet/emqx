@@ -249,7 +249,7 @@ jobs:
           run:
             shell: bash
         steps:
-        - uses: actions/download-artifact@v2
+        - uses: actions/download-artifact@v3
           name: Download built emqx and test scenario
           with:
             name: emqx_built
