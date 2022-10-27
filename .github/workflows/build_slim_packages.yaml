@@ -26,7 +26,8 @@ jobs:
           - runs-on: aws-amd64
             use-self-hosted: false
 
-    container: emqx/build-env:${{ matrix.otp }}-${{ matrix.os }}
+    #container: emqx/build-env:${{ matrix.otp }}-${{ matrix.os }}
+    container: "ghcr.io/emqx/emqx-builder/5.0-17:1.13.4-${{ matrix.otp }}-${{ matrix.os }}"
 
     steps:
     # Debug
